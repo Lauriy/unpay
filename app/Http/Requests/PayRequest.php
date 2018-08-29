@@ -28,7 +28,7 @@ class PayRequest extends FormRequest
             'amountInCents' => 'integer|required',
             'currency' => 'string|required|max:2|in:' . implode(',', config('unpay.supported_currencies')),
             'country' => 'string|required|max:2|in:' . implode(',', config('unpay.supported_countries_alpha_2')),
-            'returnUrl' => 'active_url|required'
+            'callbackUrl' => 'active_url|required'
         ];
     }
 }

@@ -14,6 +14,7 @@
     "alfaproject/omnipay-skrill": "^2.0@dev",
     "barryvdh/laravel-omnipay": "0.2.x",
     "doctrine/dbal": "^2.9@dev",
+    "encore/laravel-admin": "dev-master",
     "fideloper/proxy": "~3.3",
     "hiqdev/omnipay-bitpay": "*",
     "laravel/framework": "5.5.*",

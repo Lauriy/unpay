@@ -2,12 +2,18 @@ FROM ubuntu:18.04
 
 RUN apt update && apt install libpng-dev apache2
 
-ENV UNPAY_INSTALLATION_PATH /var/www/html
-
-WORKDIR $UNPAY_INSTALLATION_PATH
+WORKDIR /var/www/html
 
 RUN rm -rf *
 
 COPY . .
 
 COPY docker/etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/000-default.conf
+
+RUN composer install
+
+RUN php artisan migrate
+
+RUN npm install
+
+RUN npm run prod

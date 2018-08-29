@@ -15,12 +15,10 @@ class Controller extends BaseController
 
     public function pay(PayRequest $payRequest)
     {
-        Payment::create([
-
-        ]);
-
+        $returnUrl =
         $omnipayResponse = Omnipay::purchase([
-
+            'amount' => $payRequest->get('amountInCents') / 100,
+            'returnUrl' => $returnUrl
         ])->send();
 
         if ($omnipayResponse->isSuccessful()) {
