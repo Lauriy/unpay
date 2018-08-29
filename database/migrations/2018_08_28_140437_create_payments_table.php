@@ -19,10 +19,10 @@ class CreatePaymentsTable extends Migration
             $table->string('currency', 3)->nullable(false);
             $table->string('country', 2)->nullable(false);
             $table->string('callback_url')->nullable(false);
-            $table->string('chosen_method');
-            $table->json('request_data');
-            $table->json('response_data');
-            $table->dateTime('paid_at');
+            $table->string('chosen_method')->nullable(true);
+            $table->json('request_data')->nullable(true);
+            $table->json('response_data')->nullable(true);
+            $table->dateTime('paid_at')->nullable(true);
             $table->timestamps();
             $table->softDeletes();
         });
