@@ -17,6 +17,7 @@
     "encore/laravel-admin": "dev-master",
     "fideloper/proxy": "~3.3",
     "hiqdev/omnipay-bitpay": "*",
+    "laravel-validation-rules/credit-card": "dev-master",
     "laravel/framework": "5.5.*",
     "laravel/tinker": "~1.0",
     "league/omnipay": "~2.3",

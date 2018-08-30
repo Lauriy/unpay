@@ -2,7 +2,7 @@
 
 return [
     # Default gateway
-    'gateway' => 'TwoCheckout',
+    'gateway' => 'Dummy',
     'defaults' => [
         'testMode' => true,
     ],
@@ -18,6 +18,9 @@ return [
         //    'logoImageUrl' => '',
         //    'borderColor' => ''
         //],
+        'Dummy' => [
+
+        ],
         'TwoCheckout' => [
             'accountNumber' => '901390248',
             'secretWord' => 'N2IxNzlkOTUtNGIxNi00ZWI0LThhODktOGJmMDk0ZDdkNmI5'

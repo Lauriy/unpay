@@ -12,7 +12,7 @@ COPY docker/etc/apache2/sites-available/000-default.conf /etc/apache2/sites-avai
 
 RUN composer install
 
-RUN php artisan migrate
+RUN php artisan admin:install && artisan migrate
 
 RUN npm install
 

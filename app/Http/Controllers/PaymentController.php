@@ -30,7 +30,7 @@ class PaymentController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -41,7 +41,7 @@ class PaymentController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -52,7 +52,7 @@ class PaymentController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
@@ -63,8 +63,8 @@ class PaymentController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  \Illuminate\Http\Request $request
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
@@ -75,7 +75,7 @@ class PaymentController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
@@ -94,9 +94,31 @@ class PaymentController extends Controller
     public function chooseMethod($id, $chooseMethodRequest)
     {
         $payment = Payment::findOrFail($id);
-        $payment->chosen_method = $chooseMethodRequest->get('method');
+        $chosenMethod = $chooseMethodRequest->get('method');
+        $payment->chosen_method = $chosenMethod;
+        # TODO: validations
+        $payment->save();
 
-        # TODO: don't just return all of them
-        return array_keys(config('omnipay.gateways'));
+        # TODO: Maybe return array of required fields here? Then another request where the client sends those?
+        # Or maybe just allow sending all the fields but keep the optional
+        omnipay()->setGateway($chosenMethod);
+
+        $cardInput = [
+            'number' => $chooseMethodRequest['creditCardNumber'],
+            'firstName' => $chooseMethodRequest['creditCardHolder'],
+            'expiryMonth' => $chooseMethodRequest['creditCardExpiryMonth'],
+            'expiryYear' => $chooseMethodRequest['creditCardExpiryYear'],
+            'cvv' => $chooseMethodRequest['creditCardCvc'],
+        ];
+        $card = Omnipay::creditCard($cardInput);
+
+        $response = Omnipay::purchase([
+            'amount' => $payment->amount_in_cents / 100,
+            'returnUrl' => 'http://localhost:8000/return',
+            'cancelUrl' => 'http://localhost:8000/cancel',
+            'card' => $card
+        ]);
+
+        return $response;
     }
 }
