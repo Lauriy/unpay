@@ -19,8 +19,9 @@ return [
         //    'borderColor' => ''
         //],
         'Dummy' => [
-
+            # TODO: think if defining requiredFields for example here would be good
         ],
+        # https://sandbox.2checkout.com
         'TwoCheckout' => [
             'accountNumber' => '901390248',
             'secretWord' => 'N2IxNzlkOTUtNGIxNi00ZWI0LThhODktOGJmMDk0ZDdkNmI5'

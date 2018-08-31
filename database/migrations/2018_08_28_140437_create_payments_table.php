@@ -15,6 +15,7 @@ class CreatePaymentsTable extends Migration
     {
         Schema::create('payments', function (Blueprint $table) {
             $table->increments('id');
+            $table->string('reference')->nullable(false)->unique();
             $table->integer('amount_in_cents')->nullable(false);
             $table->string('currency', 3)->nullable(false);
             $table->string('country', 2)->nullable(false);

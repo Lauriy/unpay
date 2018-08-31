@@ -18,6 +18,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 
-Route::resource('payments', 'PaymentController');
-Route::get('payments/{payment}/list-methods', 'PaymentController@listMethods')
+Route::resource('payments', 'PaymentApiController');
+Route::get('payments/{payment}/list-methods', 'PaymentApiController@listMethods')
     ->name('payments.list-methods');
+Route::post('payments/{payment}/choose-method', 'PaymentApiController@chooseMethod')
+    ->name('payments.choose-method');

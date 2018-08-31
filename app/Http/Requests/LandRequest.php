@@ -2,20 +2,8 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
-
-class PayRequest extends FormRequest
+class LandRequest extends BaseRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
-    public function authorize()
-    {
-        return true;
-    }
-
     /**
      * Get the validation rules that apply to the request.
      *
@@ -23,12 +11,14 @@ class PayRequest extends FormRequest
      */
     public function rules()
     {
+        // http://localhost:8000/?reference=a1&amountInCents=9999&currency=USD&country=SV&callbackUrl=http://localhost:8000/return
         return [
             'reference' => 'string|required',
             'amountInCents' => 'integer|required',
-            'currency' => 'string|required|max:2|in:' . implode(',', config('unpay.supported_currencies')),
+            'currency' => 'string|required|max:3|in:' . implode(',', config('unpay.supported_currencies')),
             'country' => 'string|required|max:2|in:' . implode(',', config('unpay.supported_countries_alpha_2')),
-            'callbackUrl' => 'active_url|required'
+            # TODO: Consider using active_url
+            'callbackUrl' => 'url|required'
         ];
     }
 }

@@ -1,3 +1,3 @@
 <?php
 
-Route::get('/', 'PayController@index')->name('home');
+Route::get('/', 'PaymentLandingController@land')->name('landing');

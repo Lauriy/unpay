@@ -11,6 +11,7 @@
   "type": "project",
   "require": {
     "php": ">=7.0.0",
+    "ext-http": "*",
     "alfaproject/omnipay-skrill": "^2.0@dev",
     "barryvdh/laravel-omnipay": "0.2.x",
     "doctrine/dbal": "^2.9@dev",
