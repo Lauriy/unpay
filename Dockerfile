@@ -1,6 +1,6 @@
 FROM ubuntu:18.04
 
-RUN apt update && apt install libpng-dev apache2
+RUN apt update && apt install libpng-dev apache2 php-bcmath
 
 WORKDIR /var/www/html
 
@@ -17,3 +17,5 @@ RUN php artisan admin:install && artisan migrate
 RUN npm install
 
 RUN npm run prod
+
+RUN chgrp -R www-data storage bootstrap/cache database && chmod -R ug+rwx storage bootstrap/cache database
