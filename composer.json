@@ -11,7 +11,6 @@
   "type": "project",
   "require": {
     "php": ">=7.0.0",
-    "ext-http": "*",
     "alfaproject/omnipay-skrill": "^2.0@dev",
     "barryvdh/laravel-omnipay": "0.2.x",
     "doctrine/dbal": "^2.9@dev",
@@ -22,7 +21,7 @@
     "laravel/framework": "5.5.*",
     "laravel/tinker": "~1.0",
     "league/omnipay": "~2.3",
-    "omnipay/2checkout": "~2.0",
+    "collizo4sky/omnipay-2checkout": "~1.6",
     "omnipay/coinbase": "~2.0",
     "omnipay/dummy": "~2.0",
     "omnipay/paypal": "~2.0",

@@ -6,6 +6,7 @@ use App\Http\Requests\ChoosePaymentMethodRequest;
 use App\Payment;
 use http\Exception\BadMethodCallException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\App;
 use Omnipay\Omnipay;
 
@@ -98,48 +99,69 @@ class PaymentApiController extends Controller
 
     public function chooseMethod($id, ChoosePaymentMethodRequest $chooseMethodRequest)
     {
-        # FIXME: figure out barryvdh/laravel-omnipay usage
         $payment = Payment::findOrFail($id);
         $chosenMethod = $chooseMethodRequest->get('method');
         # TODO: validations
         $payment->chosen_method = $chosenMethod;
         $payment->save();
 
-        #$omnipay = App::make('omnipay');
-        #$omnipay->setDefaultGateway($chosenMethod);
-        $gateway = Omnipay::create($chosenMethod);
-        $cardInput = [
-            'number' => $chooseMethodRequest['creditCardNumber'],
-            'firstName' => $chooseMethodRequest['creditCardHolder'],
-            'expiryMonth' => $chooseMethodRequest['creditCardExpiryMonth'],
-            'expiryYear' => $chooseMethodRequest['creditCardExpiryYear'],
-            'cvv' => $chooseMethodRequest['creditCardCvc'],
-        ];
-        $response = $gateway->purchase([
-            'amount' => $payment->amount_in_cents / 100,
-            'currency' => $payment->currency,
-            'card' => $cardInput,
-            'returnUrl' => 'http://localhost:8000/return'
-        ])->send();
-
-        if ($response->isRedirect()) {
-            // redirect to offsite payment gateway
-            $response->redirect();
-        } elseif ($response->isSuccessful()) {
-            // payment was successful: update database
-            print_r($response);
-        } else {
-            // payment failed: display message to customer
-            echo $response->getMessage();
-        }
+        # FIXME: figure out barryvdh/laravel-omnipay usage
+        //$omnipay = App::make('omnipay');
+        //$omnipay->setDefaultGateway($chosenMethod);
+        //
         //$card = Omnipay::creditCard($cardInput);
-
+        //
         //$response = App::make('omnipay')->purchase([
         //    'amount' => $payment->amount_in_cents / 100,
         //    'returnUrl' => 'http://localhost:8000/return',
         //    'cancelUrl' => 'http://localhost:8000/cancel',
         //    'card' => $card
         //]);
+
+        $gateway = Omnipay::create($chosenMethod);
+        $requestData = [
+            'amount' => $payment->amount_in_cents / 100,
+            'currency' => $payment->currency,
+            'returnUrl' => 'http://localhost:8000/return'
+        ];
+        if ($gateway->getName() === 'Dummy') {
+            $cardInput = [
+                'number' => $chooseMethodRequest['creditCardNumber'],
+                'firstName' => $chooseMethodRequest['creditCardHolder'],
+                'expiryMonth' => $chooseMethodRequest['creditCardExpiryMonth'],
+                'expiryYear' => $chooseMethodRequest['creditCardExpiryYear'],
+                'cvv' => $chooseMethodRequest['creditCardCvc'],
+            ];
+        } else {
+            # FIXME: We cannot configure this way, must get barryvdh/laravel-omnipay autoloading working
+            $gateway->setAccountNumber(config('omnipay.gateways.TwoCheckout.accountNumber'));
+            $gateway->setSecretWord(config('omnipay.gateways.TwoCheckout.secretWord'));
+            $gateway->setTestMode(true);
+        }
+        if (!empty($cardInput)) {
+            $requestData['card'] = $cardInput;
+        }
+        $request = $gateway->purchase($requestData);
+        $payment->request_data = json_encode($request->getData());
+        $payment->save();
+        $response = $request->send();
+
+        if ($response->isRedirect()) {
+            return ['redirectUrl' => $response->getRedirectUrl()];
+        }
+
+        if ($response->isSuccessful()) {
+            # FIXME: Don't allow redoing this
+            $payment->response_data = json_encode($response->getData());
+            $payment->paid_at = Carbon::now();
+            $payment->save();
+            return ['redirectUrl' => $payment->callback_url];
+        }
+
+        $payment->response_data = json_encode($response->getMessage());
+        $payment->save();
+
+        return ['redirectUrl' => redirect()->to('error')];
     }
 
 //    public function methodChoice(AccessPaymentRequest $accessPaymentRequest)

@@ -22,7 +22,7 @@ class PaymentLandingController extends Controller
         ]);
     }
 
-    public function bankResponse($id)
+    public function bankReturn($id)
     {
         # TODO: Handle success/fail events
     }

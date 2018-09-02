@@ -57,13 +57,17 @@
                 axios
                     .post('/api/v1/payments/' + this.paymentId + '/choose-method', {
                         method: method,
+                        // TODO: Remove hard-code (this always succeeds)
                         creditCardNumber: '4000000000000002',
                         creditCardHolder: 'Joe Flagster',
-                        creditCardExpirationYear: 2033,
-                        creditCardExpirationMonth: 8,
+                        creditCardExpiryMonth: 8,
+                        creditCardExpiryYear: 2033,
                         creditCardCvc: '123'
                     })
-                    .then(response => (this.fieldsRequired = response.data))
+                    .then(response => (
+                        //this.fieldsRequired = response.data
+                        window.location.href = response.data.redirectUrl
+                    ))
                     .catch(error => {
                         console.log(error)
                         this.choiceError = true
