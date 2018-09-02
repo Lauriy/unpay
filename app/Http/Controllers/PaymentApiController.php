@@ -7,12 +7,12 @@ use App\Payment;
 use http\Exception\BadMethodCallException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\App;
 use Omnipay\Omnipay;
 
 class PaymentApiController extends Controller
 {
     const NOT_IMPLEMENTED_ERROR_MESSAGE = 'Not implemented';
+
     /**
      * Display a listing of the resource.
      *
@@ -122,24 +122,33 @@ class PaymentApiController extends Controller
         $requestData = [
             'amount' => $payment->amount_in_cents / 100,
             'currency' => $payment->currency,
-            'returnUrl' => 'http://localhost:8000/return'
-        ];
-        if ($gateway->getName() === 'Dummy') {
-            $cardInput = [
+            'returnUrl' => 'http://localhost:8000/return',
+            'card' => [
                 'number' => $chooseMethodRequest['creditCardNumber'],
                 'firstName' => $chooseMethodRequest['creditCardHolder'],
                 'expiryMonth' => $chooseMethodRequest['creditCardExpiryMonth'],
                 'expiryYear' => $chooseMethodRequest['creditCardExpiryYear'],
                 'cvv' => $chooseMethodRequest['creditCardCvc'],
-            ];
+            ]
+        ];
+        if ($gateway->getName() === 'Dummy') {
+
         } else {
             # FIXME: We cannot configure this way, must get barryvdh/laravel-omnipay autoloading working
-            $gateway->setAccountNumber(config('omnipay.gateways.TwoCheckout.accountNumber'));
-            $gateway->setSecretWord(config('omnipay.gateways.TwoCheckout.secretWord'));
+            $gateway->setAccountNumber(config('omnipay.gateways.TwoCheckoutPlus.accountNumber'));
+            $gateway->setSecretWord(config('omnipay.gateways.TwoCheckoutPlus.secretWord'));
             $gateway->setTestMode(true);
-        }
-        if (!empty($cardInput)) {
-            $requestData['card'] = $cardInput;
+            $gateway->setDemoMode(true);
+            $cart = [
+                [
+                    'product_id' => 1,
+                    'name' => 'Estonian Tax and Customs Board',
+                    'type' => 'Registry call',
+                    'quantity' => 1,
+                    'price' => $payment->amount_in_cents / 100
+                ]
+            ];
+            $gateway->setCart($cart);
         }
         $request = $gateway->purchase($requestData);
         $payment->request_data = json_encode($request->getData());
